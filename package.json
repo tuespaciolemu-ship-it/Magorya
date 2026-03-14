@@ -2,11 +2,12 @@
   "name": "magorya",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --dir ."
   },
   "dependencies": {
     "@n8n/chat": "^1.11.2",

@@ -1,4 +1,4 @@
-// src/features/chatbot/components/ChipurmoginChat.tsx - Todos los botones funcionales
+// src/features/chatbot/components/MagoryaChat.tsx - Todos los botones funcionales
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
@@ -21,7 +21,7 @@ interface Message {
 const INITIAL_MESSAGE: Message = {
   id: '1',
   type: 'system',
-  content: '¡Qué onda! Soy Chipurmogin, tu amiga virtual 💛✨\n\nAntes de empezar, ¿cuál es tu nombre?',
+  content: '¡Hola, mi estudiante mágico! Soy Magorya, tu asistente con magia y psicopedagogía 🧚‍♀️✨\n\n¿Cuál es tu nombre para empezar esta aventura?',
   timestamp: new Date(),
 }
 
@@ -54,7 +54,7 @@ const DATOS_CURSOS = [
   "¿Sabías que los elefantes son los únicos animales que no pueden saltar? 🐘",
 ]
 
-export function ChipurmoginChat() {
+export function MagoryaChat() {
   // Estado para controlar si ya se cargó el usuario (evitar hydration mismatch)
   const [hydrated, setHydrated] = useState(false)
 
@@ -64,7 +64,7 @@ export function ChipurmoginChat() {
     registrado: false,
     password: '',
     genero: 'otro',
-    nombreHada: 'Chipurmogin',
+    nombreHada: 'Magorya',
     memoria: [],
     proyectos: [],
     imagenesDiarias: 0,
@@ -598,7 +598,7 @@ export function ChipurmoginChat() {
       <div className="bg-gradient-to-r from-pink-400 to-yellow-300 text-white p-2 flex items-center gap-2">
         <div className="text-3xl">{getAvatar()}</div>
         <div className="flex-1">
-          <h3 className="font-bold">Chipurmogin</h3>
+          <h3 className="font-bold">Magorya</h3>
           <p className="text-xs text-white/80">{usuario.nombre ? `Hola, ${usuario.nombre}!` : 'Tu amiga virtual'}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -699,7 +699,7 @@ export function ChipurmoginChat() {
                     onClick={() => {
                       const a = document.createElement('a')
                       a.href = msg.fileUrl!
-                      a.download = `chipurmogin-${Date.now()}.png`
+                      a.download = `magorya-${Date.now()}.png`
                       a.click()
                     }}
                     className="text-xs bg-purple-500 text-white px-2 py-1 rounded-full"

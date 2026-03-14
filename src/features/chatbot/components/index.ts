@@ -1,3 +1,3 @@
 // src/features/chatbot/components/index.ts
-export { ChipurmoginChat } from './ChipurmoginChat'
+export { MagoryaChat } from './MagoryaChat'
 export { ChatWidget } from './ChatWidget'

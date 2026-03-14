@@ -1,7 +1,8 @@
 // src/app/page.tsx - Página principal estilo Antigravity
 'use client'
 
-import { ChipurmoginChat } from '@/features/chatbot/components'
+import { MagoryaChat } from '@/features/chatbot/components'
+import { FairyWidget } from '@/features/fairy/components'
 
 export default function HomePage() {
   return (
@@ -17,15 +18,20 @@ export default function HomePage() {
         {/* Título decorativo */}
         <div className="text-center mb-8">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 bg-clip-text text-transparent mb-2 animate-fade-in">
-            🌸 Antigravity Asistente Mágico
+            🧚 Magorya - Asistente Mágico
           </h1>
           <p className="text-lg md:text-xl text-purple-700 dark:text-purple-300">
-            Tu amiga virtual con inteligencia artificial ✨
+            Tu maestra mágica con psicopedagogía ✨
           </p>
         </div>
 
+        {/* Hada Interactiva */}
+        <div className="mb-8">
+          <FairyWidget />
+        </div>
+
         {/* Chat */}
-        <ChipurmoginChat />
+        <MagoryaChat />
 
         {/* Instrucciones */}
         <div className="max-w-md mx-auto mt-8 bg-white/50 backdrop-blur rounded-2xl p-6 shadow-xl border border-pink-200">

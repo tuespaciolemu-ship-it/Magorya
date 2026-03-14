@@ -1,6 +1,6 @@
-# 🌸 Chipurmogin - Tu Amiga Virtual
+# 🌸 Magorya - Asistente Mágico Amiga
 
-> **Chipurmogin** es una amiga virtual cercana, divertida y buena onda que está aquí para conversar contigo.
+> **Magorya** es una amiga virtual cercana, divertida y buena onda que está aquí para conversar contigo.
 
 ---
 
@@ -12,7 +12,8 @@
 - 📁 **Subir Archivos**: Comparte imágenes, videos, audios y documentos
 - 👆 **Avatar Interactivo**: Toca o desliza para frases rápidas
 - 💛 **Personalidad Latina**: Español latino natural y cercano
-- 🔊 **Texto a Voz**: Chipurmogin habla en español latino
+- 🔊 **Texto a Voz**: Magorya habla en español latino
+- 🧚 **Hada Mágica**: Interacciones con efectos visuales y psicopedagogía
 
 ---
 
@@ -29,13 +30,18 @@ npm install
 Crea un archivo `.env.local` con tus credenciales:
 
 ```bash
-# OpenRouter (Chipurmogin AI)
+# OpenRouter (Magorya AI)
 OPENROUTER_API_KEY=sk-or-v1-tu-api-key
 OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
 
-# Opcional: Supabase para guardar conversaciones
+# Supabase para guardar conversaciones
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
+
+# Opcional: Google Calendar, Gmail, Telegram
+GOOGLE_CLIENT_ID=tu-client-id
+GOOGLE_CLIENT_SECRET=tu-client-secret
+TELEGRAM_BOT_TOKEN=tu-bot-token
 ```
 
 ### 3. Iniciar Desarrollo
@@ -45,6 +51,17 @@ npm run dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+
+---
+
+## 🧚 Sobre Magorya
+
+Magorya es un asistente mágico con personalidad de maestra en psicopedagogía. Su misión es acompañar, organizar y motivar a las personas con magia ✨.
+
+- **Respuestas Mágicas**: Frases motivadoras con efectos visuales
+- **Psicopedagogía**: Consejos basados en principios educativos
+- **Integraciones**: Calendar, Gmail, Telegram para organización
+- **Voz y Texto**: Comunicación natural en español latino
 
 ---
 

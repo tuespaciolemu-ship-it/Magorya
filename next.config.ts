@@ -1,10 +1,12 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  // MCP server desactivado temporalmente para debugging
-  // experimental: {
-  //   mcpServer: true,
-  // },
+  // Configurar root para Turbopack
+  experimental: {
+    turbopack: {
+      root: process.cwd(),
+    },
+  },
 }
 
 export default nextConfig
