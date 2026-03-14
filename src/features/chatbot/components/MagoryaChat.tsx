@@ -471,12 +471,12 @@ export function MagoryaChat() {
     }
 
     // IA
-    const newHistory = [...conversationHistory.slice(-10), { role: 'user', content: messageText }]
+    const newHistory: ChatMessage[] = [...conversationHistory.slice(-10), { role: 'user' as const, content: messageText }]
     setConversationHistory(newHistory)
 
     try {
       setEmotion('thinking')
-      const aiResponse = await getChatResponse(messageText, newHistory, usuario.nombre)
+      const aiResponse = await getChatResponse(messageText, newHistory, usuario?.nombre)
 
       addBotMessage(aiResponse.text)
 

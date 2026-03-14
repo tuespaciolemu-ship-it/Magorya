@@ -9,7 +9,7 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata() {
   return {
     title: 'Detalle de Cita | LexAgenda'
   }

@@ -19,9 +19,9 @@ export interface Appointment {
 
 interface AppointmentCardProps {
   appointment: Appointment
-  onConfirm?: (id: string) => void
-  onCancel?: (id: string) => void
-  onReschedule?: (id: string) => void
+  onConfirm?: () => void
+  onCancel?: () => void
+  onReschedule?: () => void
 }
 
 const statusLabels: Record<string, string> = {
@@ -110,17 +110,17 @@ export function AppointmentCard({ appointment, onConfirm, onCancel, onReschedule
         {appointment.status === 'pending' && (onConfirm || onCancel || onReschedule) && (
           <div className="mt-4 pt-4 border-t border-border flex gap-3" onClick={e => e.preventDefault()}>
             {onConfirm && (
-              <Button size="sm" onClick={() => onConfirm(appointment.id)}>
+              <Button size="sm" onClick={() => onConfirm()}>
                 Confirmar
               </Button>
             )}
             {onReschedule && (
-              <Button size="sm" variant="outline" onClick={() => onReschedule(appointment.id)}>
+              <Button size="sm" variant="outline" onClick={() => onReschedule()}>
                 Reagendar
               </Button>
             )}
             {onCancel && (
-              <Button size="sm" variant="ghost" onClick={() => onCancel(appointment.id)}>
+              <Button size="sm" variant="ghost" onClick={() => onCancel()}>
                 Cancelar
               </Button>
             )}

@@ -17,8 +17,8 @@ export interface Lawyer {
 
 interface LawyerProfileCardProps {
   lawyer: Lawyer
-  onBook?: (id: string) => void
-  onViewProfile?: (id: string) => void
+  onBook?: () => void
+  onViewProfile?: () => void
 }
 
 const availabilityStyles = {
@@ -73,12 +73,12 @@ export function LawyerProfileCard({ lawyer, onBook, onViewProfile }: LawyerProfi
       <div className="mt-4 pt-4 border-t border-border flex gap-3">
         <Button 
           size="sm" 
-          onClick={() => onBook?.(lawyer.id)}
+          onClick={() => onBook?.()}
           disabled={lawyer.availability === 'unavailable'}
         >
           Agendar Cita
         </Button>
-        <Button size="sm" variant="outline" onClick={() => onViewProfile?.(lawyer.id)}>
+        <Button size="sm" variant="outline" onClick={() => onViewProfile?.()}>
           Ver Perfil
         </Button>
       </div>

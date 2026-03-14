@@ -110,9 +110,9 @@ export async function generateImageWithOpenRouter(
     return await generateImageFromPexels(prompt)
 
   } catch (error) {
-    console.error('Error con OpenRouter, usando Unsplash:', error)
-    // Fallback a Unsplash
-    return await generateImageFromUnsplash(prompt)
+    console.error('Error con OpenRouter, usando Lorem Picsum:', error)
+    // Fallback a Lorem Picsum
+    return await generateImageFromLoremPicsum(prompt)
   }
 }
 
@@ -260,17 +260,6 @@ function optimizeSearchQuery(prompt: string): string {
   })
 
   return query.trim()
-}
-
-/**
- * Simplifica el query removiendo modificadores para búsqueda más amplia
- */
-function simplifyQuery(prompt: string): string {
-  const optimized = optimizeSearchQuery(prompt)
-
-  // Tomar solo las primeras 1-2 palabras clave
-  const words = optimized.split(' ')
-  return words.slice(0, 2).join(' ')
 }
 
 /**

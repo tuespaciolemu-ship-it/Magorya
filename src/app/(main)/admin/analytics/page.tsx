@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Card } from '@/components/ui/card'
 import { AnalyticsDashboard } from './AnalyticsDashboard'
 
 export const metadata = {

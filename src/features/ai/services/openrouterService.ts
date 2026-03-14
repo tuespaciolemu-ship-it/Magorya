@@ -94,19 +94,21 @@ export async function getFairyResponse(
   }
 ): Promise<{ text: string; emotion: string }> {
   switch (interaction.type) {
-    case 'tap':
+    case 'tap': {
       const tapPhrase = await getMagicalPhrase('tap')
       return { text: tapPhrase, emotion: 'excited' }
+    }
 
-    case 'swipe':
+    case 'swipe': {
       if (interaction.direction) {
         const swipePhrase = await getMagicalPhrase('swipe', interaction.direction)
         return { text: swipePhrase, emotion: 'magical' }
       }
       const defaultSwipe = await getMagicalPhrase('swipe', 'up')
       return { text: defaultSwipe, emotion: 'magical' }
+    }
 
-    case 'voice':
+    case 'voice': {
       if (interaction.voiceText) {
         return await getChatResponse(
           interaction.voiceText,
@@ -118,12 +120,14 @@ export async function getFairyResponse(
         text: '¡Escuchando tu hechizo mágico! 🎵',
         emotion: 'thinking',
       }
+    }
 
-    case 'file':
+    case 'file': {
       return {
         text: '¡Archivo mágico recibido! ✨',
         emotion: 'happy',
       }
+    }
 
     default:
       return {

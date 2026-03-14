@@ -3,10 +3,10 @@
 interface TimeSlotPickerProps {
   slots?: string[]
   selectedSlot?: string | null
-  onSlotSelect?: (time: string) => void
+  onSlotSelect?: (selectedSlot: string) => void
   // Legacy props for backward compatibility
   selectedTime?: string
-  onTimeSelect?: (time: string) => void
+  onTimeSelect?: (selectedTime: string) => void
   availableSlots?: string[]
 }
 

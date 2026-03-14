@@ -5,16 +5,15 @@ import { Button } from '../ui/button'
 
 interface CalendarProps {
   selectedDate?: Date | null
-  onDateSelect?: (date: Date) => void
+  onDateSelect?: (selectedDate: Date) => void
   markedDates?: string[]
   minDate?: Date
-  availableDates?: Date[]
 }
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
-export function Calendar({ selectedDate, onDateSelect, markedDates, minDate, availableDates }: CalendarProps) {
+export function Calendar({ selectedDate, onDateSelect, markedDates, minDate }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(selectedDate || new Date())
 
   const year = currentMonth.getFullYear()

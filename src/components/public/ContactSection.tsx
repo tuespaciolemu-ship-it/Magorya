@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { siteConfig } from '@/config/siteConfig'
 import { SectionHeading } from './SectionHeading'
-import { MapPinIcon, PhoneIcon, MailIcon, ClockIcon } from './icons'
+import { MapPinIcon, PhoneIcon, ClockIcon } from './icons'
 
 export function ContactSection() {
   const { contact } = siteConfig
