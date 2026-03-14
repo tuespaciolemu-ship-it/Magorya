@@ -55,22 +55,31 @@ const DATOS_CURSOS = [
 ]
 
 export function ChipurmoginChat() {
-  // Usuario
-  const [usuario, setUsuario] = useState<UsuarioData>(() => {
-    const saved = userStorage.getUsuario()
-    return saved || {
-      nombre: '',
-      registrado: false,
-      password: '',
-      genero: 'otro',
-      nombreHada: 'Chipurmogin',
-      memoria: [],
-      proyectos: [],
-      imagenesDiarias: 0,
-      diasPrueba: 3,
-      fechaRegistro: new Date()
-    }
+  // Estado para controlar si ya se cargó el usuario (evitar hydration mismatch)
+  const [hydrated, setHydrated] = useState(false)
+
+  // Usuario - inicializar vacío para SSR, cargar real en cliente
+  const [usuario, setUsuario] = useState<UsuarioData>({
+    nombre: '',
+    registrado: false,
+    password: '',
+    genero: 'otro',
+    nombreHada: 'Chipurmogin',
+    memoria: [],
+    proyectos: [],
+    imagenesDiarias: 0,
+    diasPrueba: 3,
+    fechaRegistro: new Date()
   })
+
+  // Cargar usuario guardado solo en cliente después de hidratación
+  useEffect(() => {
+    const saved = userStorage.getUsuario()
+    if (saved) {
+      setUsuario(saved)
+    }
+    setHydrated(true)
+  }, [])
 
   // Estado del chat
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -120,7 +129,7 @@ export function ChipurmoginChat() {
   // Store
   const emotion = useFairyStore((s) => s.emotion)
   const setEmotion = useFairyStore((s) => s.setEmotion)
-  const setResponse = useFairyStore((s) => s.response)
+  const setResponse = useFairyStore((s) => s.setResponse)
 
   // Fecha y hora
   const fechaStr = new Date().toLocaleDateString('es-MX', {
@@ -563,25 +572,25 @@ export function ChipurmoginChat() {
 
   return (
     <>
-      {/* Burbuja flotante para ocultar/mostrar chat */}
+      {/* Burbuja flotante para minimizar/restaurar chat */}
       <div
         id="burbuja"
         className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-pink-400 to-purple-500 text-white text-2xl shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform z-50"
         onClick={() => {
-          const chat = document.getElementById('chat-wrapper')
+          const chat = document.getElementById('chat-container-wrapper')
           if (chat) {
             const isHidden = chat.style.display === 'none'
             chat.style.display = isHidden ? 'flex' : 'none'
           }
         }}
-        title="Ocultar/Mostrar chat"
+        title="Minimizar/Restaurar chat"
       >
         ✨
       </div>
 
       {/* Chat wrapper */}
-      <div id="chat-wrapper" className="flex items-center justify-center min-h-screen p-4">
-        <div className="flex flex-col h-[650px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-pink-200 w-full max-w-2xl">
+      <div id="chat-container-wrapper" className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="relative z-20 flex flex-col h-[650px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-pink-200 w-full max-w-2xl">
           {/* Onda decorativa */}
           <div className="wave"></div>
 
@@ -699,7 +708,10 @@ export function ChipurmoginChat() {
               )}
               {msg.type === 'emoji' && <div className="text-2xl text-center">{msg.content}</div>}
               <p className="whitespace-pre-line">{msg.content}</p>
-              <p className={`text-[9px] mt-1 ${['user', 'file', 'audio', 'emoji', 'image'].includes(msg.type) ? 'text-white/60' : 'text-gray-400'}`}>
+              <p
+                className={`text-[9px] mt-1 ${['user', 'file', 'audio', 'emoji', 'image'].includes(msg.type) ? 'text-white/60' : 'text-gray-400'}`}
+                suppressHydrationWarning={true}
+              >
                 {msg.timestamp.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
@@ -864,7 +876,12 @@ export function ChipurmoginChat() {
             placeholder={!usuario.nombre ? "Tu nombre..." : "¿Qué onda? 💛"}
             disabled={isTyping}
             className="flex-1 min-w-[100px] px-3 py-2 bg-pink-50 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSend()
+              }
+            }}
           />
 
           <button

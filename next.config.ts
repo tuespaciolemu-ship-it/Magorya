@@ -1,10 +1,10 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  // Activa el MCP server en /_next/mcp (Next.js 16+)
-  experimental: {
-    mcpServer: true,
-  },
+  // MCP server desactivado temporalmente para debugging
+  // experimental: {
+  //   mcpServer: true,
+  // },
 }
 
 export default nextConfig

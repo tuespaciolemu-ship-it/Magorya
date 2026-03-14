@@ -24,10 +24,8 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Chat con wrapper para ocultar/mostrar */}
-        <div id="chat-wrapper">
-          <ChipurmoginChat />
-        </div>
+        {/* Chat */}
+        <ChipurmoginChat />
 
         {/* Instrucciones */}
         <div className="max-w-md mx-auto mt-8 bg-white/50 backdrop-blur rounded-2xl p-6 shadow-xl border border-pink-200">
