@@ -562,7 +562,29 @@ export function ChipurmoginChat() {
   const diasPrueba = userStorage.diasPruebaRestantes(usuario)
 
   return (
-    <div className="flex flex-col h-[650px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-pink-200">
+    <>
+      {/* Burbuja flotante para ocultar/mostrar chat */}
+      <div
+        id="burbuja"
+        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-pink-400 to-purple-500 text-white text-2xl shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform z-50"
+        onClick={() => {
+          const chat = document.getElementById('chat-wrapper')
+          if (chat) {
+            const isHidden = chat.style.display === 'none'
+            chat.style.display = isHidden ? 'flex' : 'none'
+          }
+        }}
+        title="Ocultar/Mostrar chat"
+      >
+        ✨
+      </div>
+
+      {/* Chat wrapper */}
+      <div id="chat-wrapper" className="flex items-center justify-center min-h-screen p-4">
+        <div className="flex flex-col h-[650px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-pink-200 w-full max-w-2xl">
+          {/* Onda decorativa */}
+          <div className="wave"></div>
+
       {/* Header */}
       <div className="bg-gradient-to-r from-pink-400 to-yellow-300 text-white p-2 flex items-center gap-2">
         <div className="text-3xl">{getAvatar()}</div>
@@ -638,8 +660,8 @@ export function ChipurmoginChat() {
         {!usuario.registrado && diasPrueba > 0 && <span className="text-orange-600">⏰ {diasPrueba}d</span>}
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-gradient-to-b from-pink-50 to-yellow-50">
+      {/* Messages - chat-container */}
+      <div id="chat-container" className="flex-1 overflow-y-auto p-3 space-y-2 bg-gradient-to-b from-pink-50 to-yellow-50">
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${['user', 'file', 'audio', 'emoji'].includes(msg.type) ? 'justify-end' : 'justify-start'}`}>
             {msg.type === 'bot' && <div className="text-lg mr-1">{getAvatar()}</div>}
@@ -835,21 +857,36 @@ export function ChipurmoginChat() {
           <button onClick={() => setShowImageGenerator(!showImageGenerator)} className="p-2 bg-purple-100 rounded-lg hover:bg-purple-200">🎨</button>
 
           <input
+            id="userInput"
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={!usuario.nombre ? "Tu nombre..." : "¿Qué onda? 💛"}
             disabled={isTyping}
-            className="flex-1 min-w-[100px] px-2 py-2 bg-pink-50 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="flex-1 min-w-[100px] px-3 py-2 bg-pink-50 border border-pink-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           />
 
-          <button onClick={handleSend} disabled={(!input.trim() && !attachedFile && !audioBlob) || isTyping}
-            className="px-3 py-2 bg-gradient-to-r from-pink-400 to-yellow-300 text-white rounded-lg hover:from-pink-500 disabled:opacity-50">
+          <button
+            id="sendBtn"
+            onClick={handleSend}
+            disabled={(!input.trim() && !attachedFile && !audioBlob) || isTyping}
+            className="px-4 py-2 bg-gradient-to-r from-pink-400 to-yellow-300 text-white font-semibold rounded-lg hover:from-pink-500 hover:to-yellow-400 disabled:opacity-50"
+          >
             {audioBlob ? '📤' : 'Enviar'}
+          </button>
+
+          <button
+            id="imageBtn"
+            onClick={() => setShowImageGenerator(!showImageGenerator)}
+            className="px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 ml-1"
+          >
+            🎨 Imagen
           </button>
         </div>
       </div>
     </div>
+  </div>
+  </>
   )
 }
