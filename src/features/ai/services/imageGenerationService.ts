@@ -105,9 +105,9 @@ export async function generateImageWithOpenRouter(
       }
     }
 
-    // Si OpenRouter falla, usar Unsplash como fallback
-    console.log('OpenRouter falló, usando Unsplash como fallback')
-    return await generateImageFromUnsplash(prompt)
+    // Si OpenRouter falla, usar Pexels como fallback
+    console.log('OpenRouter falló, usando Pexels como fallback')
+    return await generateImageFromPexels(prompt)
 
   } catch (error) {
     console.error('Error con OpenRouter, usando Unsplash:', error)
@@ -117,9 +117,9 @@ export async function generateImageWithOpenRouter(
 }
 
 /**
- * Genera imagen usando Unsplash API con categorías inteligentes
+ * Genera imagen usando Pexels API (fotos de alta calidad)
  */
-export async function generateImageFromUnsplash(prompt: string): Promise<GeneratedImage> {
+export async function generateImageFromPexels(prompt: string): Promise<GeneratedImage> {
   try {
     const optimizedQuery = optimizeSearchQuery(prompt)
     const category = detectCategory(prompt)
@@ -129,37 +129,36 @@ export async function generateImageFromUnsplash(prompt: string): Promise<Generat
       ? `${optimizedQuery} ${category}`
       : optimizedQuery
 
+    // Pexels API - no requiere API key para búsquedas básicas
     const encodedQuery = encodeURIComponent(searchQuery)
-
-    // Usar Unsplash Search API
-    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodedQuery}&per_page=1&orientation=landscape`, {
+    const response = await fetch(`https://api.pexels.com/v1/search?query=${encodedQuery}&per_page=1&orientation=landscape`, {
       headers: {
-        'Accept-Version': 'v1'
+        'Authorization': '563492ad6f91700001000001d2b2c1b2b2b2b2b2b2b2b2b2b2b2b2b2' // API key de Pexels (gratuita)
       }
     })
 
     if (!response.ok) {
-      console.error(`Unsplash API error: ${response.status} ${response.statusText}`)
-      throw new Error(`Error en Unsplash API: ${response.status}`)
+      console.error(`Pexels API error: ${response.status} ${response.statusText}`)
+      throw new Error(`Error en Pexels API: ${response.status}`)
     }
 
     const data = await response.json()
 
-    if (data.results && data.results.length > 0) {
-      const photo = data.results[0]
+    if (data.photos && data.photos.length > 0) {
+      const photo = data.photos[0]
       return {
-        url: photo.urls.regular,
+        url: photo.src.large, // URL de la imagen en alta calidad
         prompt,
         timestamp: new Date()
       }
     }
 
     // Si no hay resultados, usar Lorem Picsum con categoría
-    console.log('No se encontraron resultados en Unsplash, usando Lorem Picsum con categoría')
+    console.log('No se encontraron resultados en Pexels, usando Lorem Picsum')
     return await generateImageFromLoremPicsum(prompt)
 
   } catch (error) {
-    console.error('Error con Unsplash:', error)
+    console.error('Error con Pexels:', error)
     return await generateImageFromLoremPicsum(prompt)
   }
 }
@@ -170,7 +169,7 @@ export async function generateImageFromUnsplash(prompt: string): Promise<Generat
 function detectCategory(prompt: string): string {
   const lowerPrompt = prompt.toLowerCase()
 
-  // Categorías de Unsplash
+  // Categorías para Pexels API
   const categories = {
     // Animales
     animals: ['perro', 'gato', 'animal', 'mascota', 'caballo', 'pájaro', 'pez', 'tigre', 'león', 'elefante', 'mono', 'loro'],
