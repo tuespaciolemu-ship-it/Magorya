@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useFairyStore } from '@/features/fairy/store/fairyStore'
-import { getChatResponse, generateImage, speak as speakText, type ChatMessage } from '@/features/ai/services'
+import { getChatResponse, generateImageWithOpenRouter, speak as speakText, type ChatMessage } from '@/features/ai/services'
 import { userStorage, type UsuarioData, type Proyecto } from '@/lib/storage/userStorage'
 
 interface Message {
@@ -244,7 +244,7 @@ export function ChipurmoginChat() {
     addBotMessage('¡Genial! Estoy creando tu imagen... 🎨✨', 'system')
 
     try {
-      const image = await generateImage(imagePrompt, process.env.NEXT_PUBLIC_OPENAI_API_KEY || undefined)
+      const image = await generateImageWithOpenRouter(imagePrompt, process.env.OPENROUTER_API_KEY || '')
 
       const usuarioActualizado = userStorage.incrementarImagenes(usuario)
       setUsuario(usuarioActualizado)

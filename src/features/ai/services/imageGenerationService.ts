@@ -77,12 +77,46 @@ export async function generateImageWithOpenRouter(
   openRouterKey: string
 ): Promise<GeneratedImage> {
   try {
-    // OpenRouter redirige a diferentes proveedores
-    // Por ahora usamos el método directo de OpenAI
-    return await generateImage(prompt, openRouterKey)
+    // Usar OpenRouter API para imágenes (soporta DALL-E y otros modelos)
+    const response = await fetch('https://openrouter.ai/api/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openRouterKey}`,
+        'HTTP-Referer': 'https://magorya.vercel.app', // Opcional
+        'X-Title': 'Magorya AI Assistant' // Opcional
+      },
+      body: JSON.stringify({
+        model: 'openai/dall-e-3',
+        prompt: prompt,
+        n: 1,
+        size: '1024x1024',
+        response_format: 'url'
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      console.error('Error generando imagen con OpenRouter:', error)
+      throw new Error(error.error?.message || 'Error al generar imagen con OpenRouter')
+    }
+
+    const data = await response.json()
+
+    return {
+      url: data.data[0].url,
+      prompt,
+      timestamp: new Date()
+    }
   } catch (error) {
     console.error('Error con OpenRouter images:', error)
-    throw error
+
+    // Fallback: retornar placeholder con mensaje claro
+    return {
+      url: `https://placehold.co/512x512/pink/yellow?text=${encodeURIComponent('🔧 Configuración pendiente: ' + prompt.substring(0, 15) + '...')}`,
+      prompt,
+      timestamp: new Date()
+    }
   }
 }
 
