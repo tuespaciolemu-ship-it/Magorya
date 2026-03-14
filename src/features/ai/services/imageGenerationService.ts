@@ -121,8 +121,11 @@ export async function generateImageWithOpenRouter(
  */
 export async function generateImageFromUnsplash(prompt: string): Promise<GeneratedImage> {
   try {
+    // Optimizar el prompt para mejor búsqueda en Unsplash
+    const optimizedQuery = optimizeSearchQuery(prompt)
+
     // Usar Unsplash Search API (no requiere API key para búsquedas básicas)
-    const searchQuery = encodeURIComponent(prompt)
+    const searchQuery = encodeURIComponent(optimizedQuery)
     const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchQuery}&per_page=1&orientation=landscape`, {
       headers: {
         'Accept-Version': 'v1'
@@ -144,9 +147,32 @@ export async function generateImageFromUnsplash(prompt: string): Promise<Generat
       }
     }
 
+    // Si no hay resultados, intentar con términos más simples
+    const simpleQuery = simplifyQuery(prompt)
+    if (simpleQuery !== optimizedQuery) {
+      const simpleSearchQuery = encodeURIComponent(simpleQuery)
+      const simpleResponse = await fetch(`https://api.unsplash.com/search/photos?query=${simpleSearchQuery}&per_page=1&orientation=landscape`, {
+        headers: {
+          'Accept-Version': 'v1'
+        }
+      })
+
+      if (simpleResponse.ok) {
+        const simpleData = await simpleResponse.json()
+        if (simpleData.results && simpleData.results.length > 0) {
+          const photo = simpleData.results[0]
+          return {
+            url: photo.urls.regular,
+            prompt,
+            timestamp: new Date()
+          }
+        }
+      }
+    }
+
     // Si no hay resultados, usar Lorem Picsum con el prompt como seed
     return {
-      url: `https://picsum.photos/512/512?random=${encodeURIComponent(prompt)}`,
+      url: `https://picsum.photos/512/512?random=${encodeURIComponent(optimizedQuery)}`,
       prompt,
       timestamp: new Date()
     }
@@ -161,6 +187,74 @@ export async function generateImageFromUnsplash(prompt: string): Promise<Generat
       timestamp: new Date()
     }
   }
+}
+
+/**
+ * Optimiza el query para búsqueda en Unsplash
+ */
+function optimizeSearchQuery(prompt: string): string {
+  // Convertir a minúsculas y limpiar
+  let query = prompt.toLowerCase().trim()
+
+  // Remover artículos y palabras innecesarias
+  query = query
+    .replace(/\b(un|una|el|la|los|las|de|del|y|o|en|con|por|para)\b/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  // Traducciones comunes al inglés para mejor búsqueda
+  const translations: { [key: string]: string } = {
+    'gato': 'cat',
+    'perro': 'dog',
+    'casa': 'house',
+    'ciudad': 'city',
+    'playa': 'beach',
+    'montaña': 'mountain',
+    'árbol': 'tree',
+    'flor': 'flower',
+    'sol': 'sun',
+    'luna': 'moon',
+    'estrella': 'star',
+    'cielo': 'sky',
+    'mar': 'sea',
+    'río': 'river',
+    'bosque': 'forest',
+    'desierto': 'desert',
+    'nieve': 'snow',
+    'fuego': 'fire',
+    'agua': 'water',
+    'tierra': 'earth',
+    'gris': 'gray',
+    'azul': 'blue',
+    'rojo': 'red',
+    'verde': 'green',
+    'amarillo': 'yellow',
+    'negro': 'black',
+    'blanco': 'white',
+    'rosa': 'pink',
+    'morado': 'purple',
+    'naranja': 'orange',
+    'marrón': 'brown'
+  }
+
+  // Aplicar traducciones
+  Object.keys(translations).forEach(spanish => {
+    const english = translations[spanish]
+    query = query.replace(new RegExp(`\\b${spanish}\\b`, 'g'), english)
+  })
+
+  return query.trim()
+}
+
+/**
+ * Simplifica el query removiendo modificadores para búsqueda más amplia
+ */
+function simplifyQuery(prompt: string): string {
+  const optimized = optimizeSearchQuery(prompt)
+
+  // Tomar solo las primeras 1-2 palabras clave
+  const words = optimized.split(' ')
+  return words.slice(0, 2).join(' ')
 }
 
 /**
