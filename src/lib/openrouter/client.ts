@@ -43,7 +43,7 @@ export async function chatWithOpenRouter(
     body: JSON.stringify({
       model,
       messages,
-      temperature: 0.8,
+      temperature: 0.7,
       max_tokens: 150,
     }),
   })

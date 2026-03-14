@@ -1,17 +1,18 @@
-# 🧚 Magorya - Asistente Mágico con Hada Compañera
+# 🌸 Chipurmogin - Tu Amiga Virtual
 
-> **Magorya** es un asistente personal amigable con personalidad de maestra en psicopedagogía.
-> Acompaña, organiza y motiva con magia ✨
+> **Chipurmogin** es una amiga virtual cercana, divertida y buena onda que está aquí para conversar contigo.
 
 ---
 
 ## ✨ Características
 
-- 🧚 **Hada Compañera Interactiva**: Toca, desliza y habla con tu hada mágica
-- 🎙️ **Interacción por Voz**: Usa voz para comunicarte con Magorya
-- 🧠 **Psicopedagogía**: Todas las respuestas basadas en principios de enseñanza experta
-- ✨ **Efectos Mágicos**: Partículas brillantes y animaciones
-- 🎨 **Interfaz Mágica**: Diseño colorido y encantador
+- 💬 **Chat Conversacional**: Interactúa mediante texto de forma natural
+- 🎤 **Voz a Texto**: Usa el micrófono para dictar mensajes
+- 🎙️ **Grabar Audio**: Graba y envía mensajes de voz
+- 📁 **Subir Archivos**: Comparte imágenes, videos, audios y documentos
+- 👆 **Avatar Interactivo**: Toca o desliza para frases rápidas
+- 💛 **Personalidad Latina**: Español latino natural y cercano
+- 🔊 **Texto a Voz**: Chipurmogin habla en español latino
 
 ---
 
@@ -28,13 +29,13 @@ npm install
 Crea un archivo `.env.local` con tus credenciales:
 
 ```bash
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
-
-# OpenRouter (Magorya AI)
+# OpenRouter (Chipurmogin AI)
 OPENROUTER_API_KEY=sk-or-v1-tu-api-key
 OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+
+# Opcional: Supabase para guardar conversaciones
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 ```
 
 ### 3. Iniciar Desarrollo
@@ -49,12 +50,31 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ## 🎯 Cómo Usar
 
-### Interacciones con el Hada
+### Chat de Texto
+- Escribe directamente en el chat
+- Chipurmogin responderá y te hablará 🎙️
 
-- **Tocar el hada**: Recibe frases motivadoras mágicas
-- **Deslizar**: Direcciones diferentes dan respuestas únicas
-- **Voz**: Presiona el micrófono y habla con Magorya
-- **Archivos**: Arrastra archivos para compartir con tu hada
+### Dictado por Voz
+- Presiona el botón 🎤 para dictar tu mensaje
+- Habla y tu texto aparecerá automáticamente
+
+### Grabar Mensajes de Voz
+- Presiona el botón 🎙️ (grabadora) para grabar
+- Vuelve a presionar ⏹️ cuando termines
+- Envía tu mensaje de voz
+
+### Subir Archivos
+- Presiona el botón 📁 para subir archivos
+- Soporta:
+  - 🖼️ **Imágenes** (JPG, PNG, GIF, WEBP)
+  - 🎵 **Audio** (MP3, WAV, OGG)
+  - 🎥 **Videos** (MP4, WEBM)
+  - 📄 **Documentos** (PDF, DOC, TXT)
+
+### Avatar Interactivo
+- Toca el avatar para frases rápidas
+- Desliza en diferentes direcciones
+- Partículas animadas rosa/amarillo/púrpura
 
 ---
 
@@ -67,10 +87,9 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 | **TypeScript** | Type Safety |
 | **Tailwind CSS** | Estilos |
 | **Zustand** | State Management |
-| **Supabase** | Database + Auth |
 | **OpenRouter** | AI Engine (Claude 3.5 Sonnet) |
-| **Web Speech API** | Text-to-Speech |
-| **Canvas API** | Partículas y efectos |
+| **Web Speech API** | Voice Input/Output |
+| **MediaRecorder API** | Audio Recording |
 
 ---
 
@@ -78,54 +97,56 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ```
 src/
-├── app/                        # Next.js App Router
-│   ├── page.tsx               # Página principal del hada
-│   └── globals.css            # Estilos globales y animaciones
+├── app/
+│   ├── page.tsx                    # Página principal
+│   └── globals.css                 # Estilos globales
 │
 ├── features/
-│   ├── fairy/                 # Feature del Hada Mágica
-│   │   ├── components/
-│   │   │   ├── FairyWidget.tsx    # Componente principal del hada
-│   │   │   └── Particles.tsx      # Sistema de partículas
-│   │   ├── store/
-│   │   │   └── fairyStore.ts      # Estado del hada (Zustand)
-│   │   └── types/
-│   │       └── fairy.ts           # Tipos del hada
+│   ├── chatbot/
+│   │   └── components/
+│   │       └── ChipurmoginChat.tsx # Chat con todas las funciones
 │   │
-│   └── ai/                    # Feature de IA
+│   ├── fairy/
+│   │   ├── components/
+│   │   │   ├── FairyWidget.tsx     # Avatar interactivo
+│   │   │   └── Particles.tsx       # Efectos de partículas
+│   │   └── store/
+│   │       └── fairyStore.ts       # Estado
+│   │
+│   └── ai/
 │       ├── services/
-│       │   └── openrouterService.ts  # Cliente OpenRouter
+│       │   └── openrouterService.ts # Cliente OpenRouter
 │       └── prompts/
-│           └── systemPrompt.ts      # Prompt psicopedagógico
-│
-├── lib/
-│   └── openrouter/
-│       └── client.ts          # Cliente API de OpenRouter
+│           └── systemPrompt.ts      # Personalidad latina
 │
 └── types/
-    └── fairy.ts               # Tipos compartidos
+    └── fairy.ts                    # Tipos compartidos
 ```
 
 ---
 
-## 🧠 Personalidad Psicopedagógica
+## 🌟 Personalidad
 
-Magorya está diseñada con principios de psicopedagogía:
+Chipurmogin es:
 
-1. **Aprendizaje Significativo**: Conecta respuestas con tu experiencia
-2. **Zona de Desarrollo Próximo**: Ofrece retos alcanzables
-3. **Refuerzo Positivo**: Celebra logros, por pequeños que sean
-4. **Metacognición**: Ayuda a reflexionar sobre tu aprendizaje
-5. **Autoeficacia**: Fortalece tu confianza en tus capacidades
+- **Latina**: Español latino con modismos naturales
+- **Cercana**: Habla como una amiga real
+- **Divertida**: Con humor y buena onda
+- **Equilibrada**: No es exageradamente zalamera
+- **Natural**: Respuestas claras y directas
+
+### Expresiones Latinas
+- ✅ "¿Qué onda?", "¿Qué pedo?", "¡Está chido!"
+- ✅ "¡Ta bien!", "¡Dale!", "¡Qué rollo!"
+- ✅ "Computadora", "celular", "carro"
 
 ---
 
-## 🎨 Animaciones y Efectos
+## 🎨 Colores y Estilo
 
-- **Float**: Animación flotante mágica
-- **Bounce-in**: Aparición con rebote
-- **Fade-in**: Desvanecimiento suave
-- **Glow**: Efectos de brillo pulsante
+- **Rosa** (#FFB6C1): Calidez y amistad
+- **Amarillo** (#FFD700): Alegría y positividad
+- **Púrpura** (#DDA0DD): Creatividad
 
 ---
 
@@ -143,8 +164,7 @@ npm run typecheck    # Verificación TypeScript
 
 ## 🔒 Seguridad
 
-- ✅ Validación de entrada con Zod
-- ✅ RLS (Row Level Security) en Supabase
+- ✅ Validación de archivos por tipo
 - ✅ Variables de entorno protegidas
 - ✅ Sin exposición de secrets
 
@@ -169,4 +189,4 @@ MIT
 
 ---
 
-**Hecho con ✨ y magia por Magorya**
+**Hecho con 💛 y diversión por Chipurmogin**

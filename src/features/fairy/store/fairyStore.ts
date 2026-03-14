@@ -68,7 +68,8 @@ export const useFairyStore = create<FairyStore>((set, get) => ({
   },
 
   addParticles: (count) => {
-    const colors = ['#FFD700', '#FF69B4', '#87CEEB', '#DDA0DD', '#F0E68C', '#FF6B9D', '#9B59B6', '#3498DB']
+    // Chipurmogin colors: pink, yellow, purple
+    const colors = ['#FFB6C1', '#FFD700', '#DDA0DD', '#FF69B4', '#FFE4B5', '#FF6B9D', '#9B59B6', '#F0E68C']
 
     const newParticles: Particle[] = Array.from({ length: count }, () => ({
       id: Math.random().toString(36).substr(2, 9),

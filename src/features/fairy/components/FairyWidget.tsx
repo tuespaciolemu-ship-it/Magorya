@@ -21,13 +21,43 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
 
   const fairyRef = useRef<HTMLDivElement>(null)
 
-  // Text-to-speech with Web Speech API
+  // Cargar voces disponibles
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      const loadVoices = () => {
+        speechSynthesis.getVoices()
+      }
+      loadVoices()
+      speechSynthesis.onvoiceschanged = loadVoices
+    }
+  }, [])
+
+  // Text-to-speech with Web Speech API - Voz Femenina
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
+      speechSynthesis.cancel()
       const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'es-ES'
+      utterance.lang = 'es-MX'
       utterance.rate = 1
       utterance.pitch = 1.2
+
+      // Buscar voz femenina en español
+      const voices = speechSynthesis.getVoices()
+      const femaleVoice = voices.find(voice =>
+        voice.lang.includes('es') &&
+        (voice.name.toLowerCase().includes('female') ||
+         voice.name.toLowerCase().includes('mujer') ||
+         voice.name.toLowerCase().includes('google') ||
+         voice.name.toLowerCase().includes('mex') ||
+         voice.name.toLowerCase().includes('latina') ||
+         voice.name.toLowerCase().includes('sofia') ||
+         voice.name.toLowerCase().includes('monica') ||
+         voice.name.toLowerCase().includes('victoria'))
+      ) || voices.find(voice => voice.lang.includes('es-MX') || voice.lang.includes('es-419'))
+
+      if (femaleVoice) {
+        utterance.voice = femaleVoice
+      }
 
       utterance.onstart = () => setIsSpeaking(true)
       utterance.onend = () => setIsSpeaking(false)
@@ -39,6 +69,7 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
   const handleTap = async () => {
     const phrase = await tap()
     onSpeak?.(phrase)
+    speakText(phrase)
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -66,6 +97,7 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
 
       const phrase = await swipe(direction)
       onSpeak?.(phrase)
+      speakText(phrase)
     } else {
       // It's a tap
       handleTap()
@@ -74,16 +106,16 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
     setTouchStart(null)
   }
 
-  const getFairyEmoji = () => {
+  const getAvatarEmoji = () => {
     switch (emotion) {
       case 'excited':
-        return '🧚‍♀️'
+        return '😄'
       case 'magical':
         return '✨'
       case 'thinking':
-        return '🧚'
+        return '🤔'
       default:
-        return '🧚'
+        return '🌸'
     }
   }
 
@@ -93,21 +125,21 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
 
       {/* Response bubble */}
       {response && (
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 px-6 py-3 rounded-2xl shadow-xl max-w-xs text-center animate-bounce-in border-2 border-purple-300 dark:border-purple-700">
-          <p className="text-purple-900 dark:text-purple-100 text-sm font-medium">{response}</p>
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-100 to-yellow-100 dark:from-pink-900 dark:to-yellow-900 px-6 py-3 rounded-2xl shadow-xl max-w-xs text-center animate-bounce-in border-2 border-pink-300 dark:border-pink-700">
+          <p className="text-pink-900 dark:text-pink-100 text-sm font-medium">{response}</p>
         </div>
       )}
 
       {/* Speaking indicator */}
       {isSpeaking && (
         <div className="absolute -top-4 right-0 flex gap-1">
-          <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <span className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       )}
 
-      {/* Fairy emoji */}
+      {/* Avatar emoji */}
       <div
         ref={fairyRef}
         className={`
@@ -120,10 +152,10 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
         onTouchEnd={handleTouchEnd}
         onClick={handleTap}
         style={{
-          textShadow: isAnimating ? '0 0 30px rgba(255, 215, 0, 0.8)' : '0 0 20px rgba(255, 215, 0, 0.4)',
+          textShadow: isAnimating ? '0 0 30px rgba(255, 182, 193, 0.8)' : '0 0 20px rgba(255, 182, 193, 0.4)',
         }}
       >
-        {getFairyEmoji()}
+        {getAvatarEmoji()}
       </div>
 
       {/* Glow effect */}
@@ -133,13 +165,13 @@ export function FairyWidget({ onSpeak }: FairyWidgetProps) {
           ${isAnimating ? 'opacity-50' : 'opacity-20'}
         `}
         style={{
-          background: 'radial-gradient(circle, #FFD700 0%, transparent 70%)',
+          background: 'radial-gradient(circle, #FFB6C1 0%, transparent 70%)',
         }}
       />
 
       {/* Touch hint */}
-      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-purple-700 dark:text-purple-300 text-xs text-center">
-        Toca o desliza ✨
+      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-pink-700 dark:text-pink-300 text-xs text-center">
+        Toca o desliza 💛
       </div>
     </div>
   )
