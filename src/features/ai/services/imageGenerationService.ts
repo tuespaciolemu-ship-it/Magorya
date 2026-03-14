@@ -320,23 +320,3 @@ function simpleHash(str: string): string {
   }
   return Math.abs(hash).toString()
 }
-      },
-      body: imageUrl as any
-    })
-
-    if (!response.ok) {
-      throw new Error('Error al crear variación')
-    }
-
-    const data = await response.json()
-
-    return {
-      url: data.data[0].url,
-      prompt: 'Variation',
-      timestamp: new Date()
-    }
-  } catch (error) {
-    console.error('Error en createImageVariation:', error)
-    throw error
-  }
-}
