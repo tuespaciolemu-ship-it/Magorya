@@ -117,23 +117,30 @@ export async function generateImageWithOpenRouter(
 }
 
 /**
- * Genera imagen usando Unsplash API (búsqueda de fotos reales)
+ * Genera imagen usando Unsplash API con categorías inteligentes
  */
 export async function generateImageFromUnsplash(prompt: string): Promise<GeneratedImage> {
   try {
-    // Optimizar el prompt para mejor búsqueda en Unsplash
     const optimizedQuery = optimizeSearchQuery(prompt)
+    const category = detectCategory(prompt)
 
-    // Usar Unsplash Search API (no requiere API key para búsquedas básicas)
-    const searchQuery = encodeURIComponent(optimizedQuery)
-    const response = await fetch(`https://api.unsplash.com/search/photos?query=${searchQuery}&per_page=1&orientation=landscape`, {
+    // Construir query con categoría si se detecta
+    const searchQuery = category
+      ? `${optimizedQuery} ${category}`
+      : optimizedQuery
+
+    const encodedQuery = encodeURIComponent(searchQuery)
+
+    // Usar Unsplash Search API
+    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodedQuery}&per_page=1&orientation=landscape`, {
       headers: {
         'Accept-Version': 'v1'
       }
     })
 
     if (!response.ok) {
-      throw new Error('Error en Unsplash API')
+      console.error(`Unsplash API error: ${response.status} ${response.statusText}`)
+      throw new Error(`Error en Unsplash API: ${response.status}`)
     }
 
     const data = await response.json()
@@ -141,52 +148,62 @@ export async function generateImageFromUnsplash(prompt: string): Promise<Generat
     if (data.results && data.results.length > 0) {
       const photo = data.results[0]
       return {
-        url: photo.urls.regular, // URL de la imagen
+        url: photo.urls.regular,
         prompt,
         timestamp: new Date()
       }
     }
 
-    // Si no hay resultados, intentar con términos más simples
-    const simpleQuery = simplifyQuery(prompt)
-    if (simpleQuery !== optimizedQuery) {
-      const simpleSearchQuery = encodeURIComponent(simpleQuery)
-      const simpleResponse = await fetch(`https://api.unsplash.com/search/photos?query=${simpleSearchQuery}&per_page=1&orientation=landscape`, {
-        headers: {
-          'Accept-Version': 'v1'
-        }
-      })
-
-      if (simpleResponse.ok) {
-        const simpleData = await simpleResponse.json()
-        if (simpleData.results && simpleData.results.length > 0) {
-          const photo = simpleData.results[0]
-          return {
-            url: photo.urls.regular,
-            prompt,
-            timestamp: new Date()
-          }
-        }
-      }
-    }
-
-    // Si no hay resultados, usar Lorem Picsum con el prompt como seed
-    return {
-      url: `https://picsum.photos/512/512?random=${encodeURIComponent(optimizedQuery)}`,
-      prompt,
-      timestamp: new Date()
-    }
+    // Si no hay resultados, usar Lorem Picsum con categoría
+    console.log('No se encontraron resultados en Unsplash, usando Lorem Picsum con categoría')
+    return await generateImageFromLoremPicsum(prompt)
 
   } catch (error) {
     console.error('Error con Unsplash:', error)
+    return await generateImageFromLoremPicsum(prompt)
+  }
+}
 
-    // Último fallback: Lorem Picsum
-    return {
-      url: `https://picsum.photos/512/512?random=${Date.now()}`,
-      prompt,
-      timestamp: new Date()
+/**
+ * Detecta la categoría del prompt para mejorar la búsqueda
+ */
+function detectCategory(prompt: string): string {
+  const lowerPrompt = prompt.toLowerCase()
+
+  // Categorías de Unsplash
+  const categories = {
+    // Animales
+    animals: ['perro', 'gato', 'animal', 'mascota', 'caballo', 'pájaro', 'pez', 'tigre', 'león', 'elefante', 'mono', 'loro'],
+
+    // Naturaleza
+    nature: ['árbol', 'flor', 'bosque', 'montaña', 'río', 'lago', 'playa', 'mar', 'océano', 'cielo', 'nube', 'sol', 'luna', 'estrella'],
+
+    // Personas
+    people: ['persona', 'hombre', 'mujer', 'niño', 'niña', 'familia', 'amigo', 'pareja'],
+
+    // Arquitectura
+    architecture: ['casa', 'edificio', 'ciudad', 'puente', 'torre', 'castillo', 'iglesia', 'templo'],
+
+    // Tecnología
+    technology: ['computadora', 'teléfono', 'robot', 'astronauta', 'cohete', 'espacio', 'nave', 'satélite'],
+
+    // Comida
+    food: ['comida', 'fruta', 'verdura', 'plato', 'pizza', 'hamburguesa', 'pastel'],
+
+    // Deportes
+    sports: ['fútbol', 'baloncesto', 'tenis', 'natación', 'correr', 'bicicleta'],
+
+    // Arte
+    arts: ['pintura', 'escultura', 'música', 'danza', 'teatro', 'cine']
+  }
+
+  for (const [category, keywords] of Object.entries(categories)) {
+    if (keywords.some(keyword => lowerPrompt.includes(keyword))) {
+      return category
     }
   }
+
+  return '' // Sin categoría específica
 }
 
 /**
@@ -258,17 +275,51 @@ function simplifyQuery(prompt: string): string {
 }
 
 /**
- * Genera variaciones de una imagen (requiere API key con permisos)
+ * Genera imagen usando Lorem Picsum con seed inteligente y categorías
  */
-export async function createImageVariation(
-  imageUrl: string,
-  apiKey: string
-): Promise<GeneratedImage> {
+export async function generateImageFromLoremPicsum(prompt: string): Promise<GeneratedImage> {
   try {
-    const response = await fetch('https://api.openai.com/v1/images/variations', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`
+    const optimizedSeed = optimizeSearchQuery(prompt)
+    const category = detectCategory(prompt)
+
+    // Crear seed que incluya la categoría para más variedad
+    const seed = category
+      ? `${optimizedSeed}_${category}`
+      : optimizedSeed
+
+    const hash = simpleHash(seed)
+
+    // Usar Lorem Picsum con seed para consistencia
+    const url = `https://picsum.photos/seed/${hash}/512/512`
+
+    return {
+      url,
+      prompt,
+      timestamp: new Date()
+    }
+  } catch (error) {
+    console.error('Error con Lorem Picsum:', error)
+    // Fallback final
+    return {
+      url: `https://picsum.photos/512/512?random=${Date.now()}`,
+      prompt,
+      timestamp: new Date()
+    }
+  }
+}
+
+/**
+ * Crea un hash simple para seeds consistentes
+ */
+function simpleHash(str: string): string {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convertir a 32 bits
+  }
+  return Math.abs(hash).toString()
+}
       },
       body: imageUrl as any
     })
