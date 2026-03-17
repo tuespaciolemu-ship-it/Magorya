@@ -5,6 +5,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useFairyStore } from '@/features/fairy/store/fairyStore'
 import { getChatResponse, generateImageWithOpenRouter, speak as speakText, type ChatMessage } from '@/features/ai/services'
 import { userStorage, type UsuarioData, type Proyecto } from '@/lib/storage/userStorage'
+import { detectAndExecuteGoogleCommand, isGoogleConnected, getConnectGoogleURL } from '@/features/googleworkspace/services'
+import { setWebhook, getMe } from '@/features/telegram/services'
 
 interface Message {
   id: string
@@ -67,8 +69,6 @@ export function MagoryaChat() {
     nombreHada: 'Magorya',
     memoria: [],
     proyectos: [],
-    imagenesDiarias: 0,
-    diasPrueba: 3,
     fechaRegistro: new Date()
   })
 
@@ -117,6 +117,8 @@ export function MagoryaChat() {
   // Configuración
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [autoSpeak, setAutoSpeak] = useState(true)
+  const [googleConnected, setGoogleConnected] = useState(false)
+  const [telegramConnected, setTelegramConnected] = useState(false)
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -146,6 +148,24 @@ export function MagoryaChat() {
   useEffect(() => {
     userStorage.setUsuario(usuario)
   }, [usuario])
+
+  // Verificar estado de Google
+  useEffect(() => {
+    const checkGoogleConnection = async () => {
+      const connected = await isGoogleConnected()
+      setGoogleConnected(connected)
+    }
+    checkGoogleConnection()
+  }, [])
+
+  // Verificar estado de Telegram
+  useEffect(() => {
+    const checkTelegramConnection = async () => {
+      const botInfo = await getMe()
+      setTelegramConnected(!!botInfo)
+    }
+    checkTelegramConnection()
+  }, [])
 
   // Scroll
   useEffect(() => {
@@ -232,22 +252,12 @@ export function MagoryaChat() {
   const handleGenerateImage = async () => {
     if (!imagePrompt.trim()) return
 
-    const puedeInfo = userStorage.puedeGenerarImagen(usuario)
-    if (!puedeInfo.puede) {
-      addBotMessage(puedeInfo.razon || 'No puedes generar más imágenes hoy', 'system')
-      speakWithEmotion('Lo siento, alcanzaste el límite', 'triste')
-      return
-    }
-
     setIsGeneratingImage(true)
     setShowImageGenerator(false)
     addBotMessage('¡Genial! Estoy creando tu imagen... 🎨✨', 'system')
 
     try {
       const image = await generateImageWithOpenRouter(imagePrompt, process.env.OPENROUTER_API_KEY || '')
-
-      const usuarioActualizado = userStorage.incrementarImagenes(usuario)
-      setUsuario(usuarioActualizado)
 
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -260,7 +270,7 @@ export function MagoryaChat() {
       setImagePrompt('')
 
       addBotMessage(
-        `¡Imagen lista! ✨\n\n📊 ${usuarioActualizado.imagenesDiarias}/${usuarioActualizado.registrado ? 20 : 10} imágenes hoy.\n\n¿Te gusta?`,
+        `¡Imagen lista! ✨\n\n¿Te gusta?`,
         'bot'
       )
       speakWithEmotion('¡Tu imagen está lista!', 'alegre')
@@ -470,6 +480,14 @@ export function MagoryaChat() {
       return
     }
 
+    // =================== GOOGLE WORKSPACE COMMANDS ===================
+    const googleCommand = await detectAndExecuteGoogleCommand(messageText)
+    if (googleCommand) {
+      addBotMessage(googleCommand.response)
+      speakWithEmotion('Listo', 'neutral')
+      return
+    }
+
     // IA
     const newHistory: ChatMessage[] = [...conversationHistory.slice(-10), { role: 'user' as const, content: messageText }]
     setConversationHistory(newHistory)
@@ -568,8 +586,6 @@ export function MagoryaChat() {
     }
   }
 
-  const diasPrueba = userStorage.diasPruebaRestantes(usuario)
-
   return (
     <>
       {/* Burbuja flotante para minimizar/restaurar chat */}
@@ -662,11 +678,10 @@ export function MagoryaChat() {
             📁 {usuario.proyectos.length} proyectos
           </button>
           <button onClick={() => setShowImageGenerator(true)} className="hover:text-pink-900">
-            🎨 {usuario.imagenesDiarias}/{usuario.registrado ? 20 : 10}
+            🎨 Generar imagen
           </button>
           <span>{fechaStr}</span>
         </div>
-        {!usuario.registrado && diasPrueba > 0 && <span className="text-orange-600">⏰ {diasPrueba}d</span>}
       </div>
 
       {/* Messages - chat-container */}
@@ -763,7 +778,6 @@ export function MagoryaChat() {
                 ✕
               </button>
             </div>
-            <p className="text-[10px] text-purple-700 mt-1">{usuario.imagenesDiarias}/{usuario.registrado ? 20 : 10} hoy</p>
           </div>
         )}
 
@@ -867,6 +881,36 @@ export function MagoryaChat() {
           )}
 
           <button onClick={() => setShowImageGenerator(!showImageGenerator)} className="p-2 bg-purple-100 rounded-lg hover:bg-purple-200">🎨</button>
+
+          <button
+            onClick={() => {
+              if (googleConnected) {
+                addBotMessage('🔗 Google Workspace está conectado ✅\n\nPrueba: "ver calendario", "mis emails", "mis archivos"')
+                speakWithEmotion('Google está conectado', 'alegre')
+              } else {
+                const url = getConnectGoogleURL()
+                window.open(url, '_blank')
+                addBotMessage('🔗 Abre la ventana que apareció para conectar Google ✨\n\nLuego recarga la página.')
+              }
+            }}
+            className={`p-2 rounded-lg ${googleConnected ? 'bg-green-100 hover:bg-green-200' : 'bg-blue-100 hover:bg-blue-200'}`}
+            title={googleConnected ? 'Google Workspace conectado' : 'Conectar Google Workspace'}
+          >🔗</button>
+
+          <button
+            onClick={async () => {
+              if (telegramConnected) {
+                addBotMessage('🤖 Telegram Bot está activo ✅\n\nBusca @MagoryaBot en Telegram y escribe /start')
+                speakWithEmotion('Telegram está conectado', 'alegre')
+              } else {
+                // Instrucciones para configurar Telegram
+                window.open('https://t.me/BotFather', '_blank')
+                addBotMessage('🤖 Para conectar Telegram:\n\n1️⃣ Abre @BotFather en Telegram\n2️⃣ Escribe /newbot\n3️⃣ Sigue las instrucciones\n4️⃣ Copia el token y ponlo en .env.local\n5️⃣ Usa el botón de Telegram otra vez')
+              }
+            }}
+            className={`p-2 rounded-lg ${telegramConnected ? 'bg-green-100 hover:bg-green-200' : 'bg-cyan-100 hover:bg-cyan-200'}`}
+            title={telegramConnected ? 'Telegram Bot conectado' : 'Conectar Telegram Bot'}
+          >🤖</button>
 
           <input
             id="userInput"

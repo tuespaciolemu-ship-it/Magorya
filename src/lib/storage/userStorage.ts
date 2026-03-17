@@ -24,9 +24,6 @@ export interface UsuarioData {
   nombreHada: string
   memoria: Conversacion[]
   proyectos: Proyecto[]
-  imagenesDiarias: number
-  ultimaFechaImagenes?: string // YYYY-MM-DD
-  diasPrueba: number
   fechaRegistro?: Date
 }
 
@@ -57,13 +54,6 @@ export const userStorage = {
 
       if (parsed.fechaRegistro) {
         parsed.fechaRegistro = new Date(parsed.fechaRegistro)
-      }
-
-      // Resetear contador de imágenes si es un nuevo día
-      const hoy = new Date().toISOString().split('T')[0]
-      if (parsed.ultimaFechaImagenes !== hoy) {
-        parsed.imagenesDiarias = 0
-        parsed.ultimaFechaImagenes = hoy
       }
 
       return parsed
@@ -108,28 +98,6 @@ export const userStorage = {
     })
 
     return usuario
-  },
-
-  // Verificar si puede generar más imágenes hoy
-  puedeGenerarImagen(usuario: UsuarioData): { puede: boolean; razon?: string } {
-    const limite = usuario.registrado ? 20 : 10
-
-    if (usuario.imagenesDiarias >= limite) {
-      return {
-        puede: false,
-        razon: `Límite diario de ${limite} imágenes alcanzado${usuario.registrado ? '' : ' (regístrate para tener 20)'}`
-      }
-    }
-
-    // Verificar días de prueba si no está registrado
-    if (!usuario.registrado && usuario.diasPrueba <= 0) {
-      return {
-        puede: false,
-        razon: 'Tu periodo de prueba ha terminado. Regístrate para continuar.'
-      }
-    }
-
-    return { puede: true }
   },
 
   // Agregar conversación a memoria
@@ -185,31 +153,4 @@ export const userStorage = {
     return usuario
   },
 
-  // Incrementar contador de imágenes
-  incrementarImagenes(usuario: UsuarioData): UsuarioData {
-    const hoy = new Date().toISOString().split('T')[0]
-
-    if (usuario.ultimaFechaImagenes !== hoy) {
-      usuario.imagenesDiarias = 1
-      usuario.ultimaFechaImagenes = hoy
-    } else {
-      usuario.imagenesDiarias += 1
-    }
-
-    return usuario
-  },
-
-  // Verificar días de prueba restantes
-  diasPruebaRestantes(usuario: UsuarioData): number {
-    if (usuario.registrado) return -1 // Registrado no tiene límite
-
-    if (usuario.fechaRegistro) {
-      const diasPasados = Math.floor(
-        (Date.now() - new Date(usuario.fechaRegistro).getTime()) / (1000 * 60 * 60 * 24)
-      )
-      return Math.max(0, usuario.diasPrueba - diasPasados)
-    }
-
-    return usuario.diasPrueba
-  }
 }
