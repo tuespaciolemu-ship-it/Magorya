@@ -37,14 +37,19 @@ OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
 # Supabase para guardar conversaciones
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
-
-# Opcional: Google Calendar, Gmail, Telegram
-GOOGLE_CLIENT_ID=tu-client-id
-GOOGLE_CLIENT_SECRET=tu-client-secret
-TELEGRAM_BOT_TOKEN=tu-bot-token
 ```
 
-### 3. Iniciar Desarrollo
+### 3. Configurar Integraciones (Opcional)
+
+**Google Workspace:**
+- 📖 Guía completa: [SETUP_GOOGLE.md](./SETUP_GOOGLE.md)
+- Necesitas: Google Cloud Console, OAuth credentials
+
+**Telegram Bot:**
+- 📖 Guía completa: [SETUP_TELEGRAM.md](./SETUP_TELEGRAM.md)
+- Necesitas: @BotFather, API token
+
+### 4. Iniciar Desarrollo
 
 ```bash
 npm run dev
@@ -92,6 +97,36 @@ Magorya es un asistente mágico con personalidad de maestra en psicopedagogía. 
 - Toca el avatar para frases rápidas
 - Desliza en diferentes direcciones
 - Partículas animadas rosa/amarillo/púrpura
+
+---
+
+## 🌐 Integraciones
+
+### Google Workspace 📧📅📁
+
+Magorya se integra con Google Workspace para ayudarte a organizarte:
+
+- 📅 **Calendar**: Ver y crear eventos
+- 📧 **Gmail**: Leer y enviar emails
+- 📁 **Drive**: Acceder y subir archivos
+- 📝 **Docs**: Crear documentos
+- 📊 **Sheets**: Crear hojas de cálculo
+
+📖 **Guía completa**: [SETUP_GOOGLE.md](./SETUP_GOOGLE.md)
+
+### Telegram Bot 🤖
+
+Usa Magorya desde Telegram:
+
+- /start - Inicia el bot
+- /ayuda - Ver comandos
+- /google - Menú Google Workspace
+- /calendario - Ver eventos
+- /emails - Ver emails
+- /archivos - Ver archivos de Drive
+- Chat natural con Magorya
+
+📖 **Guía completa**: [SETUP_TELEGRAM.md](./SETUP_TELEGRAM.md)
 
 ---
 
